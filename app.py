@@ -19,7 +19,7 @@ main_df1 = prep.cleaning_pipeline(main_df)
 app = Flask(__name__)
 CORS(app, support_credentials=True)
 
-@app.route("/hello")
+@app.route("/")
 @cross_origin(supports_credentials=True)
 def hello():
     return "hello"
