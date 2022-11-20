@@ -24,11 +24,6 @@ CORS(app, support_credentials=True)
 def hello():
     return "hello"
 
-@app.route("/")
-@cross_origin(supports_credentials=True)
-def hello():
-    return "hello"
-
 
 @app.route("/get_ca_data", methods=['POST'])
 @cross_origin(supports_credentials=True)
