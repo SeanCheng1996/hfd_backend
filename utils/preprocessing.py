@@ -112,6 +112,7 @@ class InitPreprocess:
         data1 = self.changing_values(data, columns, val_x=unknowns, val_y=missing_val_sub, fill_nan=fill_nan, deep=deep)
         data1 = self.changing_values(data1, columns=['Unit Type'], val_x=['DC'], val_y='District Chief')
         data1 = self.changing_values(data1, columns=['Unit Type'], val_x=['Basic'], val_y='Ambulance')
+        data1 = self.changing_values(data1, columns=['Rank'], val_x=['Enginner/Operator'], val_y='Engineer/Operator')
         return data1
 
 
