@@ -140,9 +140,9 @@ class CA:
         inertia = self.s
         perc_iner = self.s / self.s.sum()
         cum_iner = perc_iner.cumsum()
-        df = pd.DataFrame({'inertia': inertia,
-                           '% of iner': perc_iner,
-                           'cum of iner': cum_iner})
+        df = pd.DataFrame({'Inertia': inertia,
+                           '% of inertia': perc_iner,
+                           'Cummulative ineria': cum_iner})
         df = df.rename(lambda x: 'Dim '+str(x), axis=0)
         if tojson:
             return df.iloc[:return_dim, :].to_json()
@@ -225,7 +225,7 @@ class CA:
 
     def generate_stats(self, tojson=True):
         chi2, p, dof, _ = stats.chi2_contingency(self.count, correction=False)
-        stats_dict = {'chi2': chi2, 'p': p, 'DoF': dof}
+        stats_dict = {'chi-square': chi2, 'p-value': p, 'degree of freedom': dof}
         if tojson:
             return json.dumps(stats_dict)
         return stats_dict

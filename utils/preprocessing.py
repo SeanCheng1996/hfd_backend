@@ -139,11 +139,11 @@ class InitPreprocess:
         for col in columns:
             data1[col] = data1[col].apply(lambda x: 'Other' if 'incident' in x.lower() or 'other' in x.lower() else 0 if 'non' in x.lower() else 1)
         ## merge these two ruling columns based on their relation: 0 and 'other' in final ruling follow the result in review board. 1 in final ruing remains.
-        data1['merged_ruling']=data1[columns[1]]
+        data1['Merged Ruling']=data1[columns[1]]
         for index in range(len(data1[columns[0]])):
             if data1[columns[1]][index]==1:
                 continue
-            data1['merged_ruling'][index]=data1[columns[0]][index]
+            data1['Merged Ruling'][index]=data1[columns[0]][index]
         return data1
 
 
@@ -223,8 +223,8 @@ class InitPreprocess:
         Output:
             data: the modified dataFrame
         '''
-        data['freq_modified_'+column_name]=data[column_name]
-        curData=data['freq_modified_'+column_name]
+        data['Modified by Freq-'+column_name]=data[column_name]
+        curData=data['Modified by Freq-'+column_name]
         statsDict=curData.value_counts().to_dict()
         for index in range(len(curData)):
             if curData[index] in statsDict:
@@ -252,8 +252,8 @@ class InitPreprocess:
             for i, id in enumerate(freq_desc.index.values):
                 freq_acc[id] = i
         df['id'] = df.index.values
-        df['freq_modified_acc_'+column_name] = df['id'].apply(lambda x: freq_acc.get(x))
-        df['freq_modified_acc_'+column_name] = df['freq_modified_acc_'+column_name].fillna(missing_val_sub)
+        df['Modified by FreqAcc-'+column_name] = df['id'].apply(lambda x: freq_acc.get(x))
+        df['Modified by FreqAcc-'+column_name] = df['Modified by FreqAcc-'+column_name].fillna(missing_val_sub)
         df = df.drop(columns=['id'])
         return df
 
