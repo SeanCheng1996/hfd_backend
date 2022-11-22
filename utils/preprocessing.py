@@ -113,6 +113,8 @@ class InitPreprocess:
         data1 = self.changing_values(data1, columns=['Unit Type'], val_x=['DC'], val_y='District Chief')
         data1 = self.changing_values(data1, columns=['Unit Type'], val_x=['Basic'], val_y='Ambulance')
         data1 = self.changing_values(data1, columns=['Rank'], val_x=['Enginner/Operator'], val_y='Engineer/Operator')
+        data1 = self.changing_values(data1, columns=['Film'], val_x=[1.0], val_y='True')
+        data1 = self.changing_values(data1, columns=['Film'], val_x=[0.0], val_y='False')
         return data1
 
 
@@ -137,7 +139,7 @@ class InitPreprocess:
         ## else if containing 'non', change to 0; 
         ## else change to 1 (preventable).
         for col in columns:
-            data1[col] = data1[col].apply(lambda x: 'Other' if 'incident' in x.lower() or 'other' in x.lower() else 0 if 'non' in x.lower() else 1)
+            data1[col] = data1[col].apply(lambda x: 'Other' if 'incident' in x.lower() or 'other' in x.lower() else 'Non-preventable' if 'non' in x.lower() else 'Preventable')
         ## merge these two ruling columns based on their relation: 0 and 'other' in final ruling follow the result in review board. 1 in final ruing remains.
         data1['Merged Ruling']=data1[columns[1]]
         for index in range(len(data1[columns[0]])):
