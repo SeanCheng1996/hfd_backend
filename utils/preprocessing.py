@@ -22,11 +22,14 @@ warnings.filterwarnings("ignore")
 
 class InitPreprocess:
     ## columns already cleaned
-    cleaned_cols = ['Payroll',
-                    'Citation',
-                    'Cause Due to Blocking',
-                    'Emergency Run',
-                    'Spotter Used']
+    cleaned_cols = ['Payroll']
+
+    ## boolean column (can be changed to string)
+    bool_cols = ['Citation',
+                 'Cause Due to Blocking',
+                 'Emergency Run',
+                 'Spotter Used',
+                 'Film']
 
     ## columns to be dropped
     drop_cols = ['Debit Day',
@@ -44,8 +47,7 @@ class InitPreprocess:
                             'Object Struck', 
                             'Shop Number',
                             'Rank', 
-                            'Unit Type',
-                            'Film']
+                            'Unit Type']
 
     ## columns to be deep-processed
     deep_process_rulings = ['Ruling-Accident Review Board',
@@ -115,8 +117,6 @@ class InitPreprocess:
         data1 = self.changing_values(data1, columns=['Unit Type'], val_x=['DC'], val_y='District Chief')
         data1 = self.changing_values(data1, columns=['Unit Type'], val_x=['Basic'], val_y='Ambulance')
         data1 = self.changing_values(data1, columns=['Rank'], val_x=['Enginner/Operator'], val_y='Engineer/Operator')
-        data1 = self.changing_values(data1, columns=['Film'], val_x=[1.0], val_y='True')
-        data1 = self.changing_values(data1, columns=['Film'], val_x=[0.0], val_y='False')
         return data1
 
 
@@ -283,13 +283,25 @@ class InitPreprocess:
         df['Modified by FreqAcc-'+column_name] = df['Modified by FreqAcc-'+column_name].fillna(missing_val_sub)
         df = df.drop(columns=['id'])
         return df
+    
 
+    def convert_to_str(self, x):
+        '''
+        Helper function to convert x {True, 1, 1.0} to string (for matching Front-End data)
+        '''
+        try:
+            if int(x) == 1:
+                return 'True'
+            if int(x) == 0:
+                return 'False'
+        except:
+            return 'Other'
 
     def cleaning_pipeline(self, data, 
-                            drop_cols=drop_cols, debatable_cols=debatable_cols, time_dict=time_dict,
+                            drop_cols=drop_cols, debatable_cols=debatable_cols, bool_cols=bool_cols, time_dict=time_dict,
                             basic_process_cols=basic_process_cols, deep_process_rulings=deep_process_rulings, 
                             unknowns_basic=unknowns_basic, unknowns_rulings=unknowns_rulings, station_dict=station_dict,
-                            drop_debatable=True, do_process_station=True, do_process_workshift=True, freq_acc=False, rename_acc=True):
+                            drop_debatable=True, do_process_station=True, do_process_workshift=True, freq_acc=False, rename_acc=True, convert_to_str=True):
         '''
         This is the pipeline function that process the entire dataframe [data].
         NOTE: to NOT drop debatable columns (e.g. Notes, Location of Accident), set `drop_debatable=False`.
@@ -350,6 +362,11 @@ class InitPreprocess:
         ## deep processing columns (Workshift)
         if do_process_workshift:
             data1 = self.process_workshift(data1)
+        
+        ## convert to string
+        if convert_to_str:
+            for col in bool_cols:
+                data1[col] = data1[col].apply(lambda x: self.convert_to_str(x))
         
         ## rename 'Accident' to 'Collision' in column names
         if rename_acc:
