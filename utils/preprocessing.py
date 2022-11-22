@@ -52,9 +52,11 @@ class InitPreprocess:
                         'Status-Final Staff Services Ruling']
     ## ['Station', 'Work Shift'] also needs to be deep-processed, but they have their own functions
 
+    ## use 'Date of Accident' to generate 'Time of Day' variable according to rules specified in `time_dict`
+    time_dict = {'Night': (0, 6), 'Morning': (6, 12), 'Afternoon': (12, 18), 'Evening': (18, 24)}
+
     ## debatable columns (drop for now)
-    debatable_cols = ['Date of Accident', 
-                        'Notes', 
+    debatable_cols = ['Notes', 
                         'Location of Accident',
                         'Apparatus Number', 
                         'Column6']
@@ -210,6 +212,27 @@ class InitPreprocess:
                 return missing_val_sub
         data1['Work Shift'] = data1['Work Shift'].apply(lambda x: check_workshift_group(x))
         return data1
+    
+
+    def process_hour(self, data, time_dict, deep=True):
+        '''
+        This function extracts hours from 'Date of Accident' variable and characterize a colliison into 
+        ['Night', 'Morning', 'Afternoon', 'Evening].
+        Input:
+            data: pandas DataFrame that contains the `Date of Accident` column
+            time_dict: python dictionary specifying rules for dividing hours into discrete categories
+        
+        Output:
+            data: dataframe with 'Time of Day' variable added
+        '''
+        def generate_time_of_day(hour, time_dict):
+            for key in time_dict:
+                (lo, hi) = time_dict[key]
+                if hour >= lo and hour < hi:
+                    return key
+        data1 = data.copy(deep=deep)
+        data1['Time of Day'] = data1['Date of Accident'].apply(lambda x: generate_time_of_day(x.hour, time_dict) if generate_time_of_day(x.hour, time_dict) else 'Missing')
+        return data1
 
 
     def modify_by_freq(self, data, column_name='Payroll', clip_threshold=10, clip_flag=True):
@@ -230,8 +253,10 @@ class InitPreprocess:
         statsDict=curData.value_counts().to_dict()
         for index in range(len(curData)):
             if curData[index] in statsDict:
-                curData[index]=float(statsDict[curData[index]]) if not clip_flag else clip_threshold if statsDict[curData[index]]>=clip_threshold else float(statsDict[curData[index]])
+                # curData[index]=float(statsDict[curData[index]]) if not clip_flag else clip_threshold if statsDict[curData[index]]>=clip_threshold else float(statsDict[curData[index]])
+                curData[index] = 'Count ' + str(int(statsDict[curData[index]])) if not clip_flag else 'Count >=' + str(int(clip_threshold)) if statsDict[curData[index]]>=clip_threshold else 'Count ' + str(int(statsDict[curData[index]]))
         return data
+
 
     def modify_by_freq_acc(self, data, column_name='Payroll', missing_val_sub=0):
         '''
@@ -261,10 +286,9 @@ class InitPreprocess:
 
 
     def cleaning_pipeline(self, data, 
-                            drop_cols=drop_cols, debatable_cols=debatable_cols,
+                            drop_cols=drop_cols, debatable_cols=debatable_cols, time_dict=time_dict,
                             basic_process_cols=basic_process_cols, deep_process_rulings=deep_process_rulings, 
                             unknowns_basic=unknowns_basic, unknowns_rulings=unknowns_rulings, station_dict=station_dict,
-                            basic_process=basic_process, processing_rulings=processing_rulings, process_station=process_station, process_workshift=process_workshift,
                             drop_debatable=True, do_process_station=True, do_process_workshift=True, freq_acc=False, rename_acc=True):
         '''
         This is the pipeline function that process the entire dataframe [data].
@@ -309,6 +333,9 @@ class InitPreprocess:
         ## deep processing columns (GROUP 1 -- preventability rulings)
         ## unknowns_rulings = ['[Please select]', 'Unknown', 'Undetermined', 'For Information Only', 'Need More Information']
         data1 = self.processing_rulings(data1, columns=deep_process_rulings, unknowns=unknowns_rulings)
+
+        ## generate 'Time of Day' variable
+        data1 = self.process_hour(data1, time_dict=time_dict)
 
         ## modify value by frequecy. columns: Payroll, Shop Number
         ## keep modify freq by total or acc

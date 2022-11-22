@@ -19,6 +19,8 @@ main_df1 = prep.cleaning_pipeline(main_df)
 app = Flask(__name__)
 CORS(app, support_credentials=True)
 
+
+
 @app.route("/")
 @cross_origin(supports_credentials=True)
 def hello():
@@ -52,7 +54,7 @@ def get_all_variables():
     for col in main_df1.columns:
         ## extract all those variables having > 2 distinct categories, otherwise the variable
         ## cannot be active variable (row or column)
-        if len(main_df1[col].unique()) > 2 and col not in ['Payroll', 'Shop Number', 'Station']:
+        if len(main_df1[col].unique()) > 1 and col not in ['Payroll', 'Shop Number', 'Station']:
             variables.append(col)
     return {'all_variables': variables}
 
@@ -155,7 +157,7 @@ def get_prob():
     if 'col' in request.form:
         col=request.form['col']
     perform_CA = CA(data=main_df1, active_row=row, active_col=col)
-    prob_table = perform_CA.expected * perform_CA.count.sum().sum()
+    prob_table = perform_CA.prob * perform_CA.count.sum().sum()
     return prob_table.to_json()
 
 

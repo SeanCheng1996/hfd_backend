@@ -21,10 +21,10 @@ class CA:
                             `values`={Python dictionary with `keys`={old names}, `values={new names}}
         '''
         ## check conditions
-        if len(data[active_row].unique()) < 3:
-            raise Exception("Invalid row variable (need >=3 distinct categories.")
-        elif len(data[active_col].unique()) < 3:
-            raise Exception("Invalid col variable (need >=3 distinct categories.")
+        if len(data[active_row].unique()) < 2:
+            raise Exception("Invalid row variable (need >=2 distinct categories.")
+        elif len(data[active_col].unique()) < 2:
+            raise Exception("Invalid col variable (need >=2 distinct categories.")
         data = data.copy(deep=True)
 
         ## dealing with renaming
