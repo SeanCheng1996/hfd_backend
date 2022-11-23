@@ -58,7 +58,8 @@ class InitPreprocess:
     time_dict = {'Night': (0, 6), 'Morning': (6, 12), 'Afternoon': (12, 18), 'Evening': (18, 24)}
 
     ## debatable columns (drop for now)
-    debatable_cols = ['Notes', 
+    debatable_cols = ['Date of Accident',
+                        'Notes', 
                         'Location of Accident',
                         'Apparatus Number', 
                         'Column6']
