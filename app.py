@@ -157,7 +157,7 @@ def get_prob():
     if 'col' in request.form:
         col=request.form['col']
     perform_CA = CA(data=main_df1, active_row=row, active_col=col)
-    prob_table = perform_CA.prob * perform_CA.count.sum().sum()
+    prob_table = perform_CA.expected * perform_CA.count.sum().sum()
     return prob_table.to_json()
 
 
