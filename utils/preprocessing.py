@@ -231,7 +231,7 @@ class InitPreprocess:
                 if hour >= lo and hour < hi:
                     return key
         data1 = data.copy(deep=deep)
-        data1['Time of Day'] = data1['Date of Accident'].apply(lambda x: generate_time_of_day(x.hour, time_dict) if generate_time_of_day(x.hour, time_dict) else 'Missing')
+        # data1['Time of Day'] = data1['Date of Accident'].apply(lambda x: generate_time_of_day(x.hour, time_dict) if generate_time_of_day(x.hour, time_dict) else 'Missing')
         return data1
 
 
