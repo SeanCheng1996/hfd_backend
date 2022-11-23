@@ -142,12 +142,11 @@ class InitPreprocess:
         ## else change to 1 (preventable).
         for col in columns:
             data1[col] = data1[col].apply(lambda x: 'Other' if 'incident' in x.lower() or 'other' in x.lower() else 'Non-preventable' if 'non' in x.lower() else 'Preventable')
-        ## merge these two ruling columns based on their relation: 0 and 'other' in final ruling follow the result in review board. 1 in final ruing remains.
-        data1['Merged Ruling']=data1[columns[1]]
+        ## merge these two ruling columns based on their relation: default to final ruling unless final ruling is 'Other', then use review board ruling
+        data1['Merged Ruling'] = data1[columns[1]]
         for index in range(len(data1[columns[0]])):
-            if data1[columns[1]][index]==1:
-                continue
-            data1['Merged Ruling'][index]=data1[columns[0]][index]
+            if data1[columns[1]][index] == 'Other':
+                data1['Merged Ruling'][index] = data1[columns[0]][index]
         return data1
 
 
