@@ -332,6 +332,9 @@ class InitPreprocess:
         if freq_acc:
             data1 = self.modify_by_freq_acc(data)
             data1 = self.modify_by_freq_acc(data1, column_name='Shop Number')
+        
+        ## generate 'Time of Day' variable
+        data1 = self.process_hour(data1, time_dict=time_dict)
 
         ## dropping columns
         if drop_debatable:
@@ -345,9 +348,6 @@ class InitPreprocess:
         ## deep processing columns (GROUP 1 -- preventability rulings)
         ## unknowns_rulings = ['[Please select]', 'Unknown', 'Undetermined', 'For Information Only', 'Need More Information']
         data1 = self.processing_rulings(data1, columns=deep_process_rulings, unknowns=unknowns_rulings)
-
-        ## generate 'Time of Day' variable
-        data1 = self.process_hour(data1, time_dict=time_dict)
 
         ## modify value by frequecy. columns: Payroll, Shop Number
         ## keep modify freq by total or acc
